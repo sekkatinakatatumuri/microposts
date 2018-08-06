@@ -33,18 +33,21 @@ class User extends Authenticatable
         return $this->hasMany(Micropost::class);
     }
     
+    // フォロー
     public function followings()
     {
         // フォローしているUserを取得
         return $this->belongsToMany(User::class, 'user_follow', 'user_id', 'follow_id')->withTimestamps();
     }
     
+    // フォロワー
     public function followers()
     {
-        // フォローしているUserを取得 
+        // フォローされているUserを取得 
         return $this->belongsToMany(User::class, 'user_follow', 'follow_id', 'user_id')->withTimestamps();
     }
     
+    // フォロー
     public function follow($userId)
     {
         // 既にフォローしているかの確認
@@ -62,6 +65,7 @@ class User extends Authenticatable
         }
     }
 
+    // アンフォロー
     public function unfollow($userId)
     {
         // 既にフォローしているかの確認
@@ -88,5 +92,51 @@ class User extends Authenticatable
         $follow_user_ids = $this->followings()->pluck('users.id')->toArray();
         $follow_user_ids[] = $this->id;
         return Micropost::whereIn('user_id', $follow_user_ids);
+    }
+    
+    // ライクしているmicropostsを取得
+    public function likes()
+    {
+        return $this->belongsToMany(User::class, 'user_like', 'user_id', 'like_id')->withTimestamps();
+    }
+    
+    // ライク
+    public function like($userId)
+    {
+        // 既にフォローしているかの確認
+        $exist = $this->is_liking($userId);
+        // 自分自身ではないかの確認
+        $its_me = $this->id == $userId;
+    
+        if ($exist || $its_me) {
+            // 既にフォローしていれば何もしない
+            return false;
+        } else {
+            // 未フォローであればフォローする
+            $this->likes()->attach($userId);
+            return true;
+        }
+    }
+
+    // アンライク
+    public function unlike($userId)
+    {
+        // 既にフォローしているかの確認
+        $exist = $this->is_liking($userId);
+        // 自分自身ではないかの確認
+        $its_me = $this->id == $userId;
+    
+        if ($exist && !$its_me) {
+            // 既にフォローしていればフォローを外す
+            $this->likes()->detach($userId);
+            return true;
+        } else {
+            // 未フォローであれば何もしない
+            return false;
+        }
+    }
+    
+    public function is_liking($userId) {
+        return $this->likes()->where('like_id', $userId)->exists();
     }
 }

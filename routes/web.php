@@ -22,7 +22,7 @@ Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('login', 'Auth\LoginController@login')->name('login.post');
 Route::get('logout', 'Auth\LoginController@logout')->name('logout.get');
 
-// ログイン認証済み
+// ログイン認証付きのルーティング
 Route::group(['middleware' => 'auth'], function () {
     Route::resource('users', 'UsersController', ['only' => ['index', 'show']]);
     
@@ -35,6 +35,11 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('followings', 'UsersController@followings')->name('users.followings');
         // xx番目のユーザーをフォローしているユーザー一覧を表示する
         Route::get('followers', 'UsersController@followers')->name('users.followers');
+        
+        // ライク機能
+        Route::post('like', 'UserLikeController@store')->name('users.like');
+        Route::delete('unlike', 'UserLikeController@destroy')->name('users.unlike');
+        Route::get('likes', 'UsersController@likes')->name('users.likes');
     });
     
     Route::resource('microposts', 'MicropostsController', ['only' => ['store', 'destroy']]);
