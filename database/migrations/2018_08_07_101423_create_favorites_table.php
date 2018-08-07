@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUserLikeTable extends Migration
+class CreateFavoritesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,18 +13,18 @@ class CreateUserLikeTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_like', function (Blueprint $table) {
+        Schema::create('favorites', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('micropost_id')->unsigned()->index();
             $table->integer('user_id')->unsigned()->index();
-            $table->integer('like_id')->unsigned()->index();
             $table->timestamps();
             
-            // 外部キー設定
+            // 外部キー制約
+            $table->foreign('micropost_id')->references('id')->on('microposts')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('like_id')->references('id')->on('users')->onDelete('cascade');
-
-            // user_idとfollow_idの組み合わせの重複を許さない
-            $table->unique(['user_id', 'like_id']);
+            
+            //user_idとmicropost_idの組み合わせの重複を許さない
+            $table->unique(['micropost_id', 'user_id']);
         });
     }
 
@@ -35,6 +35,6 @@ class CreateUserLikeTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_like');
+        Schema::dropIfExists('favorites');
     }
 }

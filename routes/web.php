@@ -36,10 +36,10 @@ Route::group(['middleware' => 'auth'], function () {
         // xx番目のユーザーをフォローしているユーザー一覧を表示する
         Route::get('followers', 'UsersController@followers')->name('users.followers');
         
-        // ライク機能
-        Route::post('like', 'UserLikeController@store')->name('users.like');
-        Route::delete('unlike', 'UserLikeController@destroy')->name('users.unlike');
-        Route::get('likes', 'UsersController@likes')->name('users.likes');
+        // マイクロポストお気に入り機能
+        Route::post('favorite', 'UserFavoriteController@store')->name('user.favorite');
+        Route::delete('unfavorite', 'UserFavoriteController@destroy')->name('user.unfavorite');
+        Route::get('favorites', 'UsersController@favorites')->name('users.favorites');
     });
     
     Route::resource('microposts', 'MicropostsController', ['only' => ['store', 'destroy']]);

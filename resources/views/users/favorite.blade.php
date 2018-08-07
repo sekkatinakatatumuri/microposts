@@ -16,7 +16,9 @@
         <div class="col-xs-8">
             @include('commons.navtab')
             
-            @include('users.users', ['users' => $users])
+            @if (count($microposts) > 0)
+                @include('microposts.microposts', ['microposts' => $microposts])
+            @endif
         </div>
     </div>
 @endsection
